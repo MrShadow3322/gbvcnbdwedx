@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace</title>
+  <style>
+    /* Основные стили */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #1a1d2e;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+    .header, .footer {
+      background-color: #23263a;
+      padding: 10px;
+      text-align: center;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      background-color: #2e3140;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    .nav a {
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .nav a:hover {
+      background-color: #5567a6;
+      transform: scale(1.1);
+    }
+    .nav a.active {
+      background-color: #40568a;
+      transform: scale(1.1);
+    }
+    .content {
+      padding: 20px;
+      text-align: center;
+    }
+    .categories, .all-products {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .category, .product {
+      background-color: #2e3140;
+      padding: 20px;
+      border-radius: 10px;
+      transition: background-color 0.3s, transform 0.3s;
+      cursor: pointer;
+    }
+    .category:hover, .product:hover {
+      background-color: #5567a6;
+      transform: scale(1.1);
+    }
+    .button {
+      background-color: #5567a6;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .button:hover {
+      background-color: #40568a;
+      transform: scale(1.1);
+    }
+    .search-results {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .search-results .result {
+      background-color: #2e3140;
+      padding: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .search-results .result:hover {
+      background-color: #5567a6;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Marketplace</h1>
+  </header>
+  <nav class="nav">
+    <a href="javascript:void(0);" id="main-link" onclick="showPage('main')">Главная</a>
+    <a href="javascript:void(0);" id="search-link" onclick="showPage('search')">Поиск</a>
+    <a href="javascript:void(0);" id="profile-link" onclick="showPage('profile')">Профиль</a>
+  </nav>
+  <main class="content">
+    <!-- Главная -->
+    <section id="main" class="page">
+      <h2>Добро пожаловать на Marketplace</h2>
+      <button class="button" onclick="showCategories()">Категории</button>
+      <button class="button" onclick="showAllProducts()">Все товары</button>
+      <button class="button" onclick="showSellerForm()">Стать продавцом</button>
+      <div id="categories" class="categories" style="display: none;">
+        <div class="category" onclick="showCategory('home')">Для дома</div>
+        <div class="category" onclick="showCategory('tech')">Техника</div>
+        <div class="category" onclick="showCategory('clothes')">Одежда</div>
+      </div>
+      <div id="all-products" class="all-products" style="display: none;"></div>
+    </section>
+    <!-- Поиск -->
+    <section id="search" class="page" style="display: none;">
+      <h2>Поиск товаров</h2>
+      <input type="text" id="search-input" placeholder="Введите название или описание..." style="width: 80%; padding: 10px; margin-bottom: 20px;">
+      <button class="button" onclick="searchProducts()">Найти</button>
+      <div id="search-results" class="search-results"></div>
+    </section>
+    <!-- Профиль -->
+    <section id="profile" class="page" style="display: none;">
+      <h2>Профиль</h2>
+      <p>Ваш уникальный ID: <span id="user-id"></span></p>
+    </section>
+  </main>
+  <footer class="footer">
+    Marketplace © 2024
+  </footer>
+  <script>
+    // Генерация уникального ID для пользователя
+    const userId = localStorage.getItem('userId') || `user-${Math.floor(Math.random() * 1000000)}`;
+    localStorage.setItem('userId', userId);
+    document.getElementById('user-id').textContent = userId;
+
+    // Тестовые товары
+    const categories = {
+      'home': [
+        { id: 1, title: 'Уютный диван', description: 'Мягкий и удобный диван для вашего дома.', price: Math.floor(Math.random() * 3000) + 500 },
+        { id: 2, title: 'Стол с креслами', description: 'Комплект мебели для вашего офиса или дома.', price: Math.floor(Math.random() * 3000) + 1000 }
+      ],
+      'tech': [
+        { id: 3, title: 'Смартфон X100', description: 'Лучший смартфон с высокой производительностью.', price: Math.floor(Math.random() * 5000) + 2000 },
+        { id: 4, title: 'Ноутбук Y500', description: 'Мощный ноутбук для работы и игр.', price: Math.floor(Math.random() * 5000) + 3000 }
+      ],
+      'clothes': [
+        { id: 5, title: 'Футболка с принтом', description: 'Модная футболка для летнего сезона.', price: Math.floor(Math.random() * 500) + 150 },
+        { id: 6, title: 'Джинсы', description: 'Удобные джинсы для повседневной носки.', price: Math.floor(Math.random() * 1000) + 500 }
+      ]
+    };
+
+    // Поиск товаров
+    function searchProducts() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const results = [];
+      Object.values(categories).flat().forEach(product => {
+        if (product.title.toLowerCase().includes(query) || product.description.toLowerCase().includes(query)) {
+          results.push(product);
+        }
+      });
+      const searchResultsContainer = document.getElementById('search-results');
+      searchResultsContainer.innerHTML = '';
+      if (results.length) {
+        results.forEach(product => {
+          const result = document.createElement('div');
+          result.classList.add('result');
+          result.textContent = `${product.title} - ${product.price} грн`;
+          result.onclick = () => alert(`Товар: ${product.title}\nОписание: ${product.description}\nЦена: ${product.price} грн`);
+          searchResultsContainer.appendChild(result);
+        });
+      } else {
+        searchResultsContainer.textContent = 'Товар не найден.';
+      }
+    }
+
+    // Показать категории
+    function showCategories() {
+      document.getElementById('all-products').style.display = 'none';
+      document.getElementById('categories').style.display = 'flex';
+    }
+
+    // Показать все товары
+    function showAllProducts() {
+      const allProductsContainer = document.getElementById('all-products');
+      allProductsContainer.innerHTML = '';
+      Object.values(categories).flat().forEach(product => {
+        const productElement = document.createElement('div');
+        productElement.classList.add('product');
+        productElement.textContent = `${product.title} - ${product.price} грн`;
+        productElement.onclick = () => alert(`Товар: ${product.title}\nОписание: ${product.description}\nЦена: ${product.price} грн`);
+        allProductsContainer.appendChild(productElement);
+      });
+      document.getElementById('categories').style.display = 'none';
+      allProductsContainer.style.display = 'flex';
+    }
+
+    // Управление вкладками
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(section => section.style.display = 'none');
+      document.getElementById(page).style.display = 'block';
+      document.querySelectorAll('.nav a').forEach(link => link.classList.remove('active'));
+      document.getElementById(`${page}-link`).classList.add('active');
+    }
+  </script>
+</body>
+</html>
